@@ -7,7 +7,7 @@
   }
 
 body {
-    background-image: url('mcbg.gif');
+    background-image: url('../IMG/mcbg.gif');
     background-size: 100% 100%;
     background-attachment: fixed;
     background-repeat: no-repeat;
@@ -16,15 +16,22 @@ body {
 
 table {
   width: 100%;
+  border-collapse: collapse;
 }
+
 th {
-
+    border: 5px solid black;
 }
+
 td {
-
     width: 33%;
+    border: 5px solid greenyellow;
 }
 
+.centered-text {
+  text-align: center; /* Horizontal zentrieren */
+  vertical-align: middle; /* Vertikal zentrieren */
+}
 
 
 
