@@ -1,6 +1,6 @@
 // Server-Konfiguration für ARK: Survival Evolved
 const serverConfig = {
-    title: 'ARK Server',
+    title: 'Ark: Survival Evolved',
     subtitle: 'Überlebe, züchte Dinosaurier und erobere die Insel!',
     serverIP: '',  // Wird später hinzugefügt
     
@@ -50,11 +50,11 @@ const serverConfig = {
         },
         {
             label: 'Map',
-            value: 'The Island'
+            value: 'Ragnarok'
         },
         {
             label: 'Mods',
-            value: 'Vanilla+'
+            value: 'Vanilla'
         }
     ],
     

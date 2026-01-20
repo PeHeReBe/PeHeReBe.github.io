@@ -1,6 +1,6 @@
 // Server-Konfiguration für Hytale
 const serverConfig = {
-    title: 'Hytale Server',
+    title: 'Hytale',
     subtitle: 'Bereite dich auf das nächste große Abenteuer vor!',
     serverIP: '',  // Kein Server IP für Hytale
     
