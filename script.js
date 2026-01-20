@@ -129,72 +129,50 @@ console.log('%c🎮 Welcome to AFKingdom.de! 🎮', 'color: #7c3aed; font-size: 
 console.log('%cLooking for easter eggs? Keep exploring! 🔍', 'color: #a78bfa; font-size: 14px;');
 
 // Discord Server Status
-const DISCORD_GUILD_ID = '1146726678228373566';
+const DISCORD_INVITE_CODE = 'HpWG5puTBQ';
 
-// Verwende JSONP-Alternative für Discord Widget Daten
+// Verwende Discord Invite API für echte Member-Zahlen
 function updateDiscordStats() {
-    // Erstelle ein verstecktes iframe und versuche die Daten daraus zu lesen
-    const widgetUrl = `https://discord.com/api/guilds/${DISCORD_GUILD_ID}/widget.json`;
+    const inviteUrl = `https://discord.com/api/v9/invites/${DISCORD_INVITE_CODE}?with_counts=true`;
     
-    // Verwende einen CORS-Proxy für die Anfrage
-    fetch(`https://corsproxy.io/?${encodeURIComponent(widgetUrl)}`)
+    fetch(inviteUrl)
         .then(response => response.json())
         .then(data => {
-            console.log('✅ Discord Widget Daten geladen:', data);
+            console.log('✅ Discord Invite Daten geladen:', data);
             
             const membersElement = document.getElementById('discord-members');
             const onlineElement = document.getElementById('discord-online');
             
-            // Update Member Count - nutze members array falls vorhanden
-            if (membersElement) {
-                let totalMembers = 100; // Fallback
+            // Update Member Count - echte Zahl von Discord!
+            if (membersElement && data.approximate_member_count) {
+                const totalMembers = data.approximate_member_count;
                 
-                // Versuche echte Mitgliederzahl aus verschiedenen Quellen zu holen
-                if (data.members && Array.isArray(data.members)) {
-                    // Discord Widget zeigt nur Online-Mitglieder im members array
-                    // Die echte Gesamtzahl ist typischerweise 5-10x höher
-                    totalMembers = data.members.length * 8;
-                } else if (data.presence_count !== undefined) {
-                    totalMembers = data.presence_count * 8;
-                }
-                
-                // Runde die Zahl
+                // Runde die Zahl für bessere Darstellung
                 const rounded = totalMembers < 100 ? totalMembers.toString() :
                     totalMembers < 1000 ? Math.floor(totalMembers / 10) * 10 + '+' :
                     Math.floor(totalMembers / 100) * 100 + '+';
                     
                 membersElement.textContent = rounded;
                 membersElement.style.animation = 'pulse 2s ease-in-out infinite';
-                console.log(`📊 Geschätzte Mitglieder: ${rounded}`);
+                console.log(`📊 Mitglieder: ${totalMembers} (angezeigt: ${rounded})`);
             }
             
-            // Update Online Count - zeige tatsächliche Online-User
-            if (onlineElement) {
-                let onlineCount = 10; // Fallback
-                
-                if (data.members && Array.isArray(data.members)) {
-                    onlineCount = data.members.length;
-                } else if (data.presence_count !== undefined) {
-                    onlineCount = data.presence_count;
-                }
+            // Update Online Count - echte Online-User von Discord!
+            if (onlineElement && data.approximate_presence_count) {
+                const onlineCount = data.approximate_presence_count;
                 
                 onlineElement.textContent = onlineCount;
                 onlineElement.style.animation = 'pulse 2s ease-in-out infinite';
                 console.log(`🟢 Online User: ${onlineCount}`);
             }
             
-            // Update alle Discord Join Buttons mit dem echten Invite Link
-            if (data.instant_invite) {
-                console.log('✅ Discord Invite Link:', data.instant_invite);
-                const discordButtons = document.querySelectorAll('#discord-join-btn, a[href*="discord.gg"]');
-                discordButtons.forEach(btn => {
-                    btn.href = data.instant_invite;
-                });
-                console.log(`✅ ${discordButtons.length} Discord Button(s) aktualisiert!`);
+            // Server Name und andere Infos optional loggen
+            if (data.guild) {
+                console.log(`🎮 Server: ${data.guild.name}`);
             }
         })
         .catch(error => {
-            console.warn('⚠️ Discord Widget Fehler (nutze Fallback-Werte):', error.message);
+            console.warn('⚠️ Discord API Fehler (nutze Fallback-Werte):', error.message);
             
             // Fallback Werte
             const membersElement = document.getElementById('discord-members');
