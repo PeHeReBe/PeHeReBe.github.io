@@ -199,6 +199,7 @@ console.log('%cLooking for easter eggs? Keep exploring! 🔍', 'color: #a78bfa; 
 
 // Discord Server Status
 const DISCORD_INVITE_CODE = 'HpWG5puTBQ';
+let DISCORD_GUILD_ID = null;
 
 // Verwende Discord Invite API über CORS Proxy für echte Member-Zahlen
 function updateDiscordStats() {
@@ -218,6 +219,14 @@ function updateDiscordStats() {
             
             const membersElement = document.getElementById('discord-members');
             const onlineElement = document.getElementById('discord-online');
+            
+            // Speichere Guild ID für Widget API
+            if (data.guild && data.guild.id) {
+                DISCORD_GUILD_ID = data.guild.id;
+                console.log(`🆔 Guild ID: ${DISCORD_GUILD_ID}`);
+                // Hole Widget Invite nachdem wir die Guild ID haben
+                updateDiscordInviteLinks();
+            }
             
             // Update Member Count - echte Zahl von Discord!
             if (membersElement && data.approximate_member_count) {
@@ -258,9 +267,42 @@ function updateDiscordStats() {
         });
 }
 
+// Discord Widget - Dynamische Invite Links
+function updateDiscordInviteLinks() {
+    if (!DISCORD_GUILD_ID) {
+        console.warn('⚠️ Keine Guild ID vorhanden');
+        return;
+    }
+    
+    const widgetUrl = `https://discord.com/api/guilds/${DISCORD_GUILD_ID}/widget.json`;
+    
+    fetch(widgetUrl)
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Widget nicht aktiviert oder Server ID falsch');
+            }
+            return response.json();
+        })
+        .then(data => {
+            if (data.instant_invite) {
+                console.log('✅ Discord Widget Invite:', data.instant_invite);
+                
+                // Aktualisiere alle Discord Links auf der Seite
+                document.querySelectorAll('a[href*="discord.gg"]').forEach(link => {
+                    link.href = data.instant_invite;
+                });
+                console.log('🔗 Alle Discord Links aktualisiert!');
+            }
+        })
+        .catch(error => {
+            console.warn('⚠️ Discord Widget Fehler:', error.message);
+            console.warn('💡 Aktiviere das Widget: Discord Server → Einstellungen → Widget → Aktivieren');
+        });
+}
+
 // Update Discord stats on page load
-if (document.getElementById('discord-members')) {
+document.addEventListener('DOMContentLoaded', () => {
     updateDiscordStats();
     // Update alle 60 Sekunden
     setInterval(updateDiscordStats, 60000);
-}
+});
