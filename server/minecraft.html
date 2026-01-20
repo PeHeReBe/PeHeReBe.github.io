@@ -11,157 +11,19 @@
     <!-- Navigation wird dynamisch geladen -->
     <div id="nav-placeholder"></div>
 
-    <main>
-        <section class="hero server-hero">
-            <div class="hero-content">
-                <h1 class="hero-title">
-                    <span class="title-line">AFKingdom</span>
-                    <span class="title-main">Minecraft Server</span>
-                </h1>
-                <p class="hero-subtitle">Dein Survival-Abenteuer wartet auf dich!</p>
-                <div class="cta-buttons">
-                    <button class="btn btn-primary" onclick="copyServerIP()">
-                        <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
-                            <path d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z"/>
-                        </svg>
-                        Server IP kopieren
-                    </button>
-                    <a href="https://pelican.afkingdom.de/server/bc4a4794" target="_blank" class="btn btn-secondary">
-                        <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
-                            <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
-                        </svg>
-                        Server Panel
-                    </a>
-                    <a href="https://discord.gg/HpWG5puTBQ" target="_blank" class="btn btn-secondary">Discord beitreten</a>
-                </div>
-                <p class="server-ip">afkingdom.de</p>
-            </div>
-            
-            <div class="floating-shapes">
-                <div class="shape shape-1"></div>
-                <div class="shape shape-2"></div>
-                <div class="shape shape-3"></div>
-                <div class="shape shape-4"></div>
-            </div>
-        </section>
-
-        <section class="about">
-            <div class="container">
-                <h2 class="section-title">Server Features</h2>
-                <div class="about-content">
-                    <div class="about-card">
-                        <div class="card-icon">⛏️</div>
-                        <h3>Survival</h3>
-                        <p>Klassisches Survival-Erlebnis mit Freunden in einer freundlichen Community</p>
-                    </div>
-                    <div class="about-card">
-                        <div class="card-icon">🏰</div>
-                        <h3>Vanilla friendly</h3>
-                        <p>Baue frei und kreativ in unserer Vanilla-Welt</p>
-                    </div>
-                    <div class="about-card">
-                        <div class="card-icon">💎</div>
-                        <h3>Economy</h3>
-                        <p>Verdiene Geld, handel mit Spielern und baue dein Imperium auf</p>
-                    </div>
-                </div>
-
-                <div class="server-info">
-                    <h2 class="section-title">Server Informationen</h2>
-                    <div class="info-grid">
-                        <div class="info-item">
-                            <h4>Version</h4>
-                            <p id="mc-version">1.21.10 (Java Edition)</p>
-                        </div>
-                        <div class="info-item">
-                            <h4>Spieler Online</h4>
-                            <p id="mc-players">0 / 999</p>
-                        </div>
-                        <div class="info-item">
-                            <h4>Status</h4>
-                            <p id="mc-status">🟢 Online</p>
-                        </div>
-                        <div class="info-item">
-                            <h4>Server IP</h4>
-                            <p>afkingdom.de</p>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </section>
-    </main>
+    <!-- Main wird vom Renderer mit Template gefüllt -->
+    <main></main>
 
     <!-- Footer wird dynamisch geladen -->
     <div id="footer-placeholder"></div>
 
+    <!-- Server Config -->
+    <script src="minecraft-config.js"></script>
+    
+    <!-- Server Renderer -->
+    <script src="server-renderer.js"></script>
+    
+    <!-- Script für Components -->
     <script src="../script.js"></script>
-    <script>
-        function copyServerIP() {
-            const serverIP = 'afkingdom.de';
-            navigator.clipboard.writeText(serverIP).then(() => {
-                const btn = event.currentTarget;
-                const originalText = btn.innerHTML;
-                btn.innerHTML = '<svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg> Kopiert!';
-                setTimeout(() => {
-                    btn.innerHTML = originalText;
-                }, 2000);
-            });
-        }
-
-        // Minecraft Server Status Update
-        function updateMinecraftStatus() {
-            const serverIP = 'afkingdom.de';
-            const apiUrl = `https://api.mcsrvstat.us/3/${serverIP}`;
-            
-            fetch(apiUrl)
-                .then(response => response.json())
-                .then(data => {
-                    console.log('✅ Minecraft Server Daten:', data);
-                    
-                    const versionElement = document.getElementById('mc-version');
-                    const playersElement = document.getElementById('mc-players');
-                    const statusElement = document.getElementById('mc-status');
-                    
-                    if (data.online) {
-                        // Server ist online
-                        if (versionElement && data.version) {
-                            versionElement.textContent = `${data.version} (Java Edition)`;
-                        }
-                        
-                        if (playersElement && data.players) {
-                            const online = data.players.online || 0;
-                            const max = data.players.max || 999;
-                            playersElement.textContent = `${online} / ${max}`;
-                        }
-                        
-                        if (statusElement) {
-                            statusElement.textContent = '🟢 Online';
-                            statusElement.style.color = 'var(--accent-primary)';
-                        }
-                    } else {
-                        // Server ist offline - Fallback-Werte
-                        if (statusElement) {
-                            statusElement.textContent = '🔴 Offline';
-                            statusElement.style.color = '#ff4444';
-                        }
-                        
-                        if (playersElement) {
-                            playersElement.textContent = '0 / 999';
-                        }
-                    }
-                })
-                .catch(error => {
-                    console.warn('⚠️ Minecraft API Fehler:', error);
-                    // Bei Fehler Fallback-Werte beibehalten
-                });
-        }
-
-        // Status beim Laden aktualisieren
-        if (document.getElementById('mc-version')) {
-            updateMinecraftStatus();
-            // Update alle 30 Sekunden
-            setInterval(updateMinecraftStatus, 30000);
-        }
-    </script>
 </body>
 </html>
