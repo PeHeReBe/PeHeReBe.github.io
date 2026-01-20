@@ -198,57 +198,51 @@ console.log('%c🎮 Welcome to AFKingdom.de! 🎮', 'color: #7c3aed; font-size: 
 console.log('%cLooking for easter eggs? Keep exploring! 🔍', 'color: #a78bfa; font-size: 14px;');
 
 // Discord Server Status
-const DISCORD_INVITE_CODE = 'HpWG5puTBQ';
+const DISCORD_SERVER_ID = '1175455629537591357'; // Ersetze dies mit deiner tatsächlichen Server-ID
 
-// Verwende Discord Invite API über CORS Proxy für echte Member-Zahlen
+// Verwende Discord Widget API (CORS-freundlich)
 function updateDiscordStats() {
-    // CORS Proxy um Discord API anzusprechen
-    const inviteUrl = `https://discord.com/api/v10/invites/${DISCORD_INVITE_CODE}?with_counts=true`;
-    const proxyUrl = `https://api.allorigins.win/raw?url=${encodeURIComponent(inviteUrl)}`;
+    // Discord Widget API - erlaubt CORS!
+    const widgetUrl = `https://discord.com/api/guilds/${DISCORD_SERVER_ID}/widget.json`;
     
-    fetch(proxyUrl)
+    fetch(widgetUrl)
         .then(response => {
             if (!response.ok) {
-                throw new Error(`HTTP ${response.status}`);
+                throw new Error(`HTTP ${response.status}: Widget muss auf dem Discord-Server aktiviert sein`);
             }
             return response.json();
         })
         .then(data => {
-            console.log('✅ Discord Invite Daten geladen:', data);
+            console.log('✅ Discord Widget Daten geladen:', data);
             
             const membersElement = document.getElementById('discord-members');
             const onlineElement = document.getElementById('discord-online');
             
-            // Update Member Count - echte Zahl von Discord!
-            if (membersElement && data.approximate_member_count) {
-                const totalMembers = data.approximate_member_count;
-                
-                // Runde die Zahl für bessere Darstellung
-                const rounded = totalMembers < 100 ? totalMembers.toString() :
-                    totalMembers < 1000 ? Math.floor(totalMembers / 10) * 10 + '+' :
-                    Math.floor(totalMembers / 100) * 100 + '+';
-                    
-                membersElement.textContent = rounded;
-                membersElement.style.animation = 'pulse 2s ease-in-out infinite';
-                console.log(`📊 Mitglieder: ${totalMembers} (angezeigt: ${rounded})`);
-            }
-            
-            // Update Online Count - echte Online-User von Discord!
-            if (onlineElement && data.approximate_presence_count) {
-                const onlineCount = data.approximate_presence_count;
-                
+            // Update Online Count - Anzahl der online User im Widget
+            if (onlineElement && data.presence_count !== undefined) {
+                const onlineCount = data.presence_count;
                 onlineElement.textContent = onlineCount;
                 onlineElement.style.animation = 'pulse 2s ease-in-out infinite';
                 console.log(`🟢 Online User: ${onlineCount}`);
             }
             
-            // Server Name und andere Infos optional loggen
-            if (data.guild) {
-                console.log(`🎮 Server: ${data.guild.name}`);
+            // Für Member Count gibt die Widget API leider nicht die Gesamtzahl zurück
+            // Daher zeigen wir nur Online-User oder einen festen Wert
+            if (membersElement) {
+                // Zeige "Viele Mitglieder" oder einen festen geschätzten Wert
+                membersElement.textContent = '100+';
+                membersElement.style.animation = 'pulse 2s ease-in-out infinite';
+                console.log(`📊 Mitglieder: Anzeige mit Fallback-Wert`);
+            }
+            
+            // Server Name loggen
+            if (data.name) {
+                console.log(`🎮 Server: ${data.name}`);
             }
         })
         .catch(error => {
-            console.warn('⚠️ Discord API Fehler (nutze Fallback-Werte):', error.message);
+            console.warn('⚠️ Discord Widget API Fehler:', error.message);
+            console.warn('💡 Tipp: Aktiviere das Server Widget in Discord Server-Einstellungen → Widget');
             
             // Fallback Werte
             const membersElement = document.getElementById('discord-members');
@@ -264,37 +258,3 @@ if (document.getElementById('discord-members')) {
     // Update alle 60 Sekunden
     setInterval(updateDiscordStats, 60000);
 }
-
-// Discord Widget - Dynamische Invite Links
-const DISCORD_SERVER_ID = '1175455629537591357'; // Deine Server ID
-
-function updateDiscordInviteLinks() {
-    const widgetUrl = `https://discord.com/api/guilds/${DISCORD_SERVER_ID}/widget.json`;
-    
-    fetch(widgetUrl)
-        .then(response => {
-            if (!response.ok) {
-                throw new Error('Widget nicht aktiviert');
-            }
-            return response.json();
-        })
-        .then(data => {
-            if (data.instant_invite) {
-                console.log('✅ Discord Widget Invite Link:', data.instant_invite);
-                
-                // Aktualisiere alle Discord Links auf der Seite
-                document.querySelectorAll('a[href*="discord.gg"]').forEach(link => {
-                    link.href = data.instant_invite;
-                    console.log('🔗 Discord Link aktualisiert:', link);
-                });
-            }
-        })
-        .catch(error => {
-            console.warn('⚠️ Discord Widget API Fehler:', error.message);
-            console.warn('💡 Tipp: Aktiviere das Server Widget in Discord Server-Einstellungen → Widget');
-            // Fallback: Links bleiben unverändert
-        });
-}
-
-// Lade Invite Links beim Seitenstart
-document.addEventListener('DOMContentLoaded', updateDiscordInviteLinks);
