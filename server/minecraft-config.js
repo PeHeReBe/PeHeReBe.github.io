@@ -1,5 +1,6 @@
 // Server-Konfiguration für Minecraft
 const serverConfig = {
+    pageTitle: 'Minecraft - AFKingdom',
     title: 'Minecraft',
     subtitle: 'Dein Survival-Abenteuer wartet auf dich!',
     serverIP: 'afkingdom.de',

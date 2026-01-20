@@ -1,5 +1,6 @@
 // Server-Konfiguration für ARK: Survival Evolved
 const serverConfig = {
+    pageTitle: 'ARK - AFKingdom',
     title: 'Ark: Survival Evolved',
     subtitle: 'Überlebe, züchte Dinosaurier und erobere die Insel!',
     serverIP: '',  // Wird später hinzugefügt

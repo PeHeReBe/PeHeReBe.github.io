@@ -2,6 +2,11 @@
 
 async function renderServerPage() {
     try {
+        // Setze Browser-Tab-Title
+        if (serverConfig.pageTitle) {
+            document.title = serverConfig.pageTitle;
+        }
+        
         // Lade das Server-Template
         const response = await fetch('../components/server-template.html');
         const template = await response.text();
