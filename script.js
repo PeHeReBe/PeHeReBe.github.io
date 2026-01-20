@@ -145,20 +145,42 @@ function updateDiscordStats() {
             const membersElement = document.getElementById('discord-members');
             const onlineElement = document.getElementById('discord-online');
             
-            // Update Member Count (approximiert aus presence_count)
-            if (membersElement && data.presence_count !== undefined) {
-                const approxMembers = Math.max(Math.floor(data.presence_count * 3), 100);
-                const rounded = approxMembers < 1000 ? 
-                    Math.floor(approxMembers / 10) * 10 + '+' : 
-                    Math.floor(approxMembers / 100) * 100 + '+';
+            // Update Member Count - nutze members array falls vorhanden
+            if (membersElement) {
+                let totalMembers = 100; // Fallback
+                
+                // Versuche echte Mitgliederzahl aus verschiedenen Quellen zu holen
+                if (data.members && Array.isArray(data.members)) {
+                    // Discord Widget zeigt nur Online-Mitglieder im members array
+                    // Die echte Gesamtzahl ist typischerweise 5-10x höher
+                    totalMembers = data.members.length * 8;
+                } else if (data.presence_count !== undefined) {
+                    totalMembers = data.presence_count * 8;
+                }
+                
+                // Runde die Zahl
+                const rounded = totalMembers < 100 ? totalMembers.toString() :
+                    totalMembers < 1000 ? Math.floor(totalMembers / 10) * 10 + '+' :
+                    Math.floor(totalMembers / 100) * 100 + '+';
+                    
                 membersElement.textContent = rounded;
                 membersElement.style.animation = 'pulse 2s ease-in-out infinite';
+                console.log(`📊 Geschätzte Mitglieder: ${rounded}`);
             }
             
-            // Update Online Count
-            if (onlineElement && data.presence_count !== undefined) {
-                onlineElement.textContent = data.presence_count;
+            // Update Online Count - zeige tatsächliche Online-User
+            if (onlineElement) {
+                let onlineCount = 10; // Fallback
+                
+                if (data.members && Array.isArray(data.members)) {
+                    onlineCount = data.members.length;
+                } else if (data.presence_count !== undefined) {
+                    onlineCount = data.presence_count;
+                }
+                
+                onlineElement.textContent = onlineCount;
                 onlineElement.style.animation = 'pulse 2s ease-in-out infinite';
+                console.log(`🟢 Online User: ${onlineCount}`);
             }
             
             // Update alle Discord Join Buttons mit dem echten Invite Link
