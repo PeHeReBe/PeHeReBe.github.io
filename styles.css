@@ -170,8 +170,8 @@ body {
 .dropdown-item {
     display: flex;
     align-items: center;
-    gap: 0.8rem;
-    padding: 1rem 1.5rem;
+    justify-content: center;
+    padding: 0.8rem;
     color: var(--text-secondary);
     text-decoration: none;
     transition: all 0.3s ease;
@@ -180,7 +180,7 @@ body {
 .dropdown-item:hover {
     background: rgba(124, 58, 237, 0.2);
     color: var(--accent-secondary);
-    padding-left: 2rem;
+    transform: scale(1.05);
 }
 
 /* Hero Section */
