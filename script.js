@@ -12,37 +12,74 @@ document.querySelectorAll('a[href^="#"]').forEach(anchor => {
     });
 });
 
-// Mobile Menu Toggle
-document.addEventListener('DOMContentLoaded', () => {
-    // Wait for components to load
-    setTimeout(() => {
-        const hamburger = document.getElementById('hamburger');
-        const navLinks = document.getElementById('nav-links');
-        
-        if (hamburger && navLinks) {
-            hamburger.addEventListener('click', () => {
-                hamburger.classList.toggle('active');
-                navLinks.classList.toggle('active');
-            });
-            
-            // Close menu when clicking on a link
-            navLinks.querySelectorAll('a').forEach(link => {
-                link.addEventListener('click', () => {
-                    hamburger.classList.remove('active');
-                    navLinks.classList.remove('active');
-                });
-            });
-            
-            // Close menu when clicking outside
-            document.addEventListener('click', (e) => {
-                if (!hamburger.contains(e.target) && !navLinks.contains(e.target)) {
-                    hamburger.classList.remove('active');
-                    navLinks.classList.remove('active');
-                }
-            });
+function initMobileNavigation() {
+    const hamburger = document.getElementById('hamburger');
+    const navLinks = document.getElementById('nav-links');
+
+    if (!hamburger || !navLinks) return;
+    if (hamburger.dataset.bound === '1') return;
+    hamburger.dataset.bound = '1';
+
+    const isMobile = () => window.matchMedia('(max-width: 768px)').matches;
+
+    const closeAllDropdowns = () => {
+        navLinks.querySelectorAll('.dropdown.open').forEach((d) => d.classList.remove('open'));
+    };
+
+    const closeMenu = () => {
+        hamburger.classList.remove('active');
+        hamburger.setAttribute('aria-expanded', 'false');
+        navLinks.classList.remove('active');
+        closeAllDropdowns();
+    };
+
+    hamburger.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const willOpen = !hamburger.classList.contains('active');
+        hamburger.classList.toggle('active');
+        navLinks.classList.toggle('active');
+        hamburger.setAttribute('aria-expanded', willOpen ? 'true' : 'false');
+        if (!willOpen) closeAllDropdowns();
+    });
+
+    // Dropdowns on mobile: toggle on click, only one open
+    navLinks.querySelectorAll('.dropdown-btn').forEach((btn) => {
+        btn.addEventListener('click', (e) => {
+            if (!isMobile()) return;
+            e.preventDefault();
+
+            const dropdown = btn.closest('.dropdown');
+            if (!dropdown) return;
+
+            const isOpen = dropdown.classList.contains('open');
+            closeAllDropdowns();
+            if (!isOpen) dropdown.classList.add('open');
+        });
+    });
+
+    // Close menu when clicking a normal link
+    navLinks.querySelectorAll('a').forEach((link) => {
+        link.addEventListener('click', () => {
+            if (isMobile()) closeMenu();
+        });
+    });
+
+    // Close when clicking outside
+    document.addEventListener('click', (e) => {
+        if (!isMobile()) return;
+        if (!hamburger.contains(e.target) && !navLinks.contains(e.target)) {
+            closeMenu();
         }
-    }, 100);
-});
+    });
+
+    // Reset state when resizing to desktop
+    window.addEventListener('resize', () => {
+        if (!isMobile()) closeMenu();
+    });
+}
+
+document.addEventListener('DOMContentLoaded', initMobileNavigation);
+document.addEventListener('components:loaded', initMobileNavigation);
 
 // Navbar scroll effect
 let lastScroll = 0;

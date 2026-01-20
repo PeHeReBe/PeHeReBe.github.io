@@ -1,28 +1,42 @@
 // Component Loader - Lädt Navigation und Footer dynamisch
 async function loadComponents() {
-    // Lade Navigation
     const navPlaceholder = document.getElementById('nav-placeholder');
-    if (navPlaceholder) {
-        try {
-            const response = await fetch('/components/nav.html');
-            const html = await response.text();
-            navPlaceholder.innerHTML = html;
-        } catch (error) {
-            console.error('Navigation konnte nicht geladen werden:', error);
-        }
-    }
-    
-    // Lade Footer
     const footerPlaceholder = document.getElementById('footer-placeholder');
-    if (footerPlaceholder) {
-        try {
-            const response = await fetch('/components/footer.html');
-            const html = await response.text();
-            footerPlaceholder.innerHTML = html;
-        } catch (error) {
-            console.error('Footer konnte nicht geladen werden:', error);
-        }
+
+    const tasks = [];
+
+    // Lade Navigation
+    if (navPlaceholder) {
+        tasks.push(
+            fetch('/components/nav.html')
+                .then((response) => response.text())
+                .then((html) => {
+                    navPlaceholder.innerHTML = html;
+                })
+                .catch((error) => {
+                    console.error('Navigation konnte nicht geladen werden:', error);
+                })
+        );
     }
+
+    // Lade Footer
+    if (footerPlaceholder) {
+        tasks.push(
+            fetch('/components/footer.html')
+                .then((response) => response.text())
+                .then((html) => {
+                    footerPlaceholder.innerHTML = html;
+                })
+                .catch((error) => {
+                    console.error('Footer konnte nicht geladen werden:', error);
+                })
+        );
+    }
+
+    await Promise.all(tasks);
+
+    // Signal: Komponenten sind im DOM
+    document.dispatchEvent(new CustomEvent('components:loaded'));
 }
 
 // Lade Components beim Seitenstart

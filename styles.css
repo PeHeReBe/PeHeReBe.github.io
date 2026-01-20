@@ -130,26 +130,33 @@ body {
 /* Hamburger Menu */
 .hamburger {
     display: none;
-    flex-direction: column;
-    gap: 5px;
     background: none;
     border: none;
     cursor: pointer;
-    padding: 0.5rem;
+    width: 44px;
+    height: 44px;
+    padding: 0;
+    position: relative;
     z-index: 1001;
 }
 
 .hamburger span {
-    display: block;
-    width: 25px;
+    position: absolute;
+    left: 10px;
+    right: 10px;
     height: 3px;
     background: var(--accent-secondary);
-    transition: all 0.3s ease;
+    transition: transform 0.25s ease, opacity 0.2s ease, top 0.25s ease;
     border-radius: 3px;
 }
 
+.hamburger span:nth-child(1) { top: 14px; }
+.hamburger span:nth-child(2) { top: 21px; }
+.hamburger span:nth-child(3) { top: 28px; }
+
 .hamburger.active span:nth-child(1) {
-    transform: rotate(45deg) translate(8px, 8px);
+    top: 21px;
+    transform: rotate(45deg);
 }
 
 .hamburger.active span:nth-child(2) {
@@ -157,7 +164,8 @@ body {
 }
 
 .hamburger.active span:nth-child(3) {
-    transform: rotate(-45deg) translate(7px, -7px);
+    top: 21px;
+    transform: rotate(-45deg);
 }
 
 /* Dropdown Menu */
@@ -469,9 +477,16 @@ body {
     .hamburger {
         display: flex;
     }
-    
+
     .nav-content {
         position: relative;
+        justify-content: flex-start;
+        gap: 0.5rem;
+        padding: 0 1rem;
+    }
+
+    .logo {
+        flex: 1;
     }
     
     .nav-links {
@@ -497,15 +512,31 @@ body {
     .nav-link::after {
         display: none;
     }
-    
+
+    /* Mobile dropdowns: collapsed by default, opened via JS (.open) */
     .dropdown-content {
         position: static;
+        box-shadow: none;
+        width: 100%;
+        margin-top: 0.5rem;
+        opacity: 0;
+        visibility: hidden;
+        transform: none;
+        max-height: 0;
+        overflow: hidden;
+        transition: max-height 0.25s ease, opacity 0.2s ease;
+        pointer-events: none;
+    }
+
+    .dropdown.open .dropdown-content {
         opacity: 1;
         visibility: visible;
-        transform: none;
-        box-shadow: none;
-        margin-top: 0.5rem;
-        width: 100%;
+        max-height: 500px;
+        pointer-events: auto;
+    }
+
+    .dropdown.open .dropdown-icon {
+        transform: rotate(180deg);
     }
     
     .title-main {
