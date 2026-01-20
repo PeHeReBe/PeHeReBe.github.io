@@ -83,9 +83,11 @@ document.addEventListener('components:loaded', initMobileNavigation);
 
 // Navbar scroll effect
 let lastScroll = 0;
-const navbar = document.querySelector('.navbar');
 
 window.addEventListener('scroll', () => {
+    const navbar = document.querySelector('.navbar');
+    if (!navbar) return; // Navbar existiert nicht auf dieser Seite
+    
     const currentScroll = window.pageYOffset;
     
     if (currentScroll > 100) {
@@ -199,7 +201,7 @@ console.log('%cLooking for easter eggs? Keep exploring! 🔍', 'color: #a78bfa; 
 
 // Discord Server Status - Guild ID für AFKingdom
 const DISCORD_GUILD_ID = '1146726678228373566';
-const DISCORD_FALLBACK_INVITE = 'https://discord.gg/HpWG5puTBQ';
+const DISCORD_FALLBACK_INVITE = 'https://discord.gg/Quark';
 
 // Verwende Discord Widget API (CORS-freundlich!)
 function updateDiscordStats() {
