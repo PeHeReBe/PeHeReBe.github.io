@@ -200,12 +200,19 @@ console.log('%cLooking for easter eggs? Keep exploring! 🔍', 'color: #a78bfa; 
 // Discord Server Status
 const DISCORD_INVITE_CODE = 'HpWG5puTBQ';
 
-// Verwende Discord Invite API für echte Member-Zahlen
+// Verwende Discord Invite API über CORS Proxy für echte Member-Zahlen
 function updateDiscordStats() {
-    const inviteUrl = `https://discord.com/api/v9/invites/${DISCORD_INVITE_CODE}?with_counts=true`;
+    // CORS Proxy um Discord API anzusprechen
+    const inviteUrl = `https://discord.com/api/v10/invites/${DISCORD_INVITE_CODE}?with_counts=true`;
+    const proxyUrl = `https://api.allorigins.win/raw?url=${encodeURIComponent(inviteUrl)}`;
     
-    fetch(inviteUrl)
-        .then(response => response.json())
+    fetch(proxyUrl)
+        .then(response => {
+            if (!response.ok) {
+                throw new Error(`HTTP ${response.status}`);
+            }
+            return response.json();
+        })
         .then(data => {
             console.log('✅ Discord Invite Daten geladen:', data);
             
