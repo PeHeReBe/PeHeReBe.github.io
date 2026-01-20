@@ -19,8 +19,11 @@ async function renderServerPage() {
         fillTemplate(serverConfig);
         
         // Führe Custom Scripts aus (z.B. Minecraft Status Update)
+        // Warte einen Tick, damit DOM-Elemente verfügbar sind
         if (serverConfig.customScripts && serverConfig.customScripts.onLoad) {
-            serverConfig.customScripts.onLoad();
+            setTimeout(() => {
+                serverConfig.customScripts.onLoad();
+            }, 0);
         }
         
     } catch (error) {
