@@ -1,5 +1,5 @@
 // AFKingdom.de Script
-const SCRIPT_VERSION = '1.2.0';
+const SCRIPT_VERSION = '1.2.2';
 const SCRIPT_BUILD_DATE = '2026-01-20';
 
 console.log(`%c📦 AFKingdom Script v${SCRIPT_VERSION} (${SCRIPT_BUILD_DATE})`, 'color: #10b981; font-size: 12px;');
@@ -149,26 +149,7 @@ if (dropdownBtn && window.innerWidth <= 768) {
     });
 }
 
-// Ambient background light that follows cursor
-const ambientLight = document.createElement('div');
-ambientLight.style.position = 'fixed';
-ambientLight.style.width = '600px';
-ambientLight.style.height = '600px';
-ambientLight.style.borderRadius = '50%';
-ambientLight.style.background = 'radial-gradient(circle, rgba(124, 58, 237, 0.15) 0%, transparent 70%)';
-ambientLight.style.pointerEvents = 'none';
-ambientLight.style.zIndex = '1';
-ambientLight.style.transform = 'translate(-50%, -50%)';
-ambientLight.style.transition = 'all 0.3s ease';
-ambientLight.style.filter = 'blur(60px)';
-document.body.appendChild(ambientLight);
-
-document.addEventListener('mousemove', (e) => {
-    if (window.innerWidth > 768) {
-        ambientLight.style.left = e.clientX + 'px';
-        ambientLight.style.top = e.clientY + 'px';
-    }
-});
+// Ambient background light removed
 
 // Add dynamic text animation for hero title
 const heroTitle = document.querySelector('.title-main');
