@@ -1,3 +1,9 @@
+// AFKingdom.de Script
+const SCRIPT_VERSION = '1.0.1';
+const SCRIPT_BUILD_DATE = '2026-01-20';
+
+console.log(`%c📦 AFKingdom Script v${SCRIPT_VERSION} (${SCRIPT_BUILD_DATE})`, 'color: #10b981; font-size: 12px;');
+
 // Smooth scroll for navigation links
 document.querySelectorAll('a[href^="#"]').forEach(anchor => {
     anchor.addEventListener('click', function (e) {
