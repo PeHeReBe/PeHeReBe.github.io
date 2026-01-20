@@ -1,5 +1,5 @@
 // AFKingdom.de Script
-const SCRIPT_VERSION = '1.2.3';
+const SCRIPT_VERSION = '1.2.4';
 const SCRIPT_BUILD_DATE = '2026-01-20';
 
 console.log(`%c📦 AFKingdom Script v${SCRIPT_VERSION} (${SCRIPT_BUILD_DATE})`, 'color: #10b981; font-size: 12px;');

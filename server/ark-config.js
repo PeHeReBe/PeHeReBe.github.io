@@ -3,7 +3,7 @@ const serverConfig = {
     pageTitle: 'ARK - AFKingdom',
     title: 'ARK',
     subtitle: 'Überlebe, züchte Dinosaurier und erobere die Insel!',
-    serverIP: '',  // Wird später hinzugefügt
+    serverIP: 'ark.afkingdom.de',  // Wird später hinzugefügt
     
     buttons: [
         {
