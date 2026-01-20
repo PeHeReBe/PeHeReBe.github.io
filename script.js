@@ -1,5 +1,5 @@
 // AFKingdom.de Script
-const SCRIPT_VERSION = '1.0.1';
+const SCRIPT_VERSION = '1.1.0';
 const SCRIPT_BUILD_DATE = '2026-01-20';
 
 console.log(`%c📦 AFKingdom Script v${SCRIPT_VERSION} (${SCRIPT_BUILD_DATE})`, 'color: #10b981; font-size: 12px;');
@@ -207,72 +207,90 @@ console.log('%cLooking for easter eggs? Keep exploring! 🔍', 'color: #a78bfa; 
 
 // Discord Server Status - Guild ID für AFKingdom
 const DISCORD_GUILD_ID = '1146726678228373566';
-const DISCORD_FALLBACK_INVITE = 'https://discord.gg/Quark';
+const DISCORD_INVITE_CODE = 'HpWG5puTBQ';
 
-// Verwende Discord Widget API (CORS-freundlich!)
-function updateDiscordStats() {
-    const widgetUrl = `https://discord.com/api/guilds/${DISCORD_GUILD_ID}/widget.json`;
+// Hole echte Member-Zahlen von Invite API
+function updateDiscordMemberStats() {
+    // Direkt Discord API ohne Proxy versuchen (funktioniert manchmal)
+    const inviteUrl = `https://discord.com/api/v10/invites/${DISCORD_INVITE_CODE}?with_counts=true`;
     
-    fetch(widgetUrl)
-        .then(response => {
-            if (!response.ok) {
-                throw new Error(`HTTP ${response.status}`);
-            }
-            return response.json();
-        })
+    fetch(inviteUrl)
+        .then(response => response.json())
         .then(data => {
-            console.log('✅ Discord Widget Daten geladen:', data);
+            console.log('✅ Discord Member-Daten:', data);
             
             const membersElement = document.getElementById('discord-members');
             const onlineElement = document.getElementById('discord-online');
             
-            // Update Online Count
-            if (onlineElement && data.presence_count !== undefined) {
-                onlineElement.textContent = data.presence_count;
-                onlineElement.style.animation = 'pulse 2s ease-in-out infinite';
-                console.log(`🟢 Online User: ${data.presence_count}`);
-            }
-            
-            // Member Count - Widget gibt nur Online, also schätzen wir
-            if (membersElement) {
-                // Schätzung: Online-User * ~6 für Gesamtmitglieder
-                const estimated = data.presence_count ? Math.max(data.presence_count * 6, 70) : 70;
-                const rounded = estimated < 100 ? estimated.toString() :
-                    estimated < 1000 ? Math.floor(estimated / 10) * 10 + '+' : 
-                    Math.floor(estimated / 100) * 100 + '+';
+            // Update Member Count - ECHTE Zahlen!
+            if (membersElement && data.approximate_member_count) {
+                const totalMembers = data.approximate_member_count;
+                const rounded = totalMembers < 100 ? totalMembers.toString() :
+                    totalMembers < 1000 ? Math.floor(totalMembers / 10) * 10 + '+' :
+                    Math.floor(totalMembers / 100) * 100 + '+';
+                    
                 membersElement.textContent = rounded;
                 membersElement.style.animation = 'pulse 2s ease-in-out infinite';
-                console.log(`📊 Mitglieder (geschätzt): ${rounded}`);
+                console.log(`📊 Mitglieder: ${totalMembers} (angezeigt: ${rounded})`);
             }
             
-            // Server Name loggen
-            if (data.name) {
-                console.log(`🎮 Server: ${data.name}`);
+            // Update Online Count
+            if (onlineElement && data.approximate_presence_count) {
+                onlineElement.textContent = data.approximate_presence_count;
+                onlineElement.style.animation = 'pulse 2s ease-in-out infinite';
+                console.log(`🟢 Online User: ${data.approximate_presence_count}`);
             }
+        })
+        .catch(error => {
+            console.warn('⚠️ Invite API nicht erreichbar (CORS), nutze Widget API Fallback');
+        });
+}
+
+// Hole Widget Invite für trackbare Links
+function updateDiscordInviteLinks() {
+    const widgetUrl = `https://discord.com/api/guilds/${DISCORD_GUILD_ID}/widget.json`;
+    
+    fetch(widgetUrl)
+        .then(response => response.json())
+        .then(data => {
+            console.log('✅ Discord Widget Daten:', data);
             
             // Widget Invite für alle Discord-Links verwenden
             if (data.instant_invite) {
-                console.log('✅ Discord Widget Invite:', data.instant_invite);
+                console.log('✅ Widget Invite:', data.instant_invite);
                 document.querySelectorAll('a[href*="discord.gg"], a[href*="discord.com/invite"]').forEach(link => {
                     link.href = data.instant_invite;
                 });
                 console.log('🔗 Alle Discord Links aktualisiert!');
             }
-        })
-        .catch(error => {
-            console.warn('⚠️ Discord Widget Fehler:', error.message);
             
-            // Fallback Werte
+            // Fallback für Stats wenn Invite API nicht geht
             const membersElement = document.getElementById('discord-members');
             const onlineElement = document.getElementById('discord-online');
-            if (membersElement) membersElement.textContent = '70+';
-            if (onlineElement) onlineElement.textContent = '10+';
+            
+            if (onlineElement && !onlineElement.textContent && data.presence_count !== undefined) {
+                onlineElement.textContent = data.presence_count;
+                console.log(`🟢 Online (Widget): ${data.presence_count}`);
+            }
+            
+            if (membersElement && !membersElement.textContent) {
+                membersElement.textContent = '70+';
+                console.log('📊 Member Count nicht verfügbar, zeige Schätzung');
+            }
+        })
+        .catch(error => {
+            console.warn('⚠️ Widget API Fehler:', error.message);
         });
 }
 
 // Update Discord stats on page load
 document.addEventListener('DOMContentLoaded', () => {
-    updateDiscordStats();
+    updateDiscordMemberStats(); // Echte Zahlen
+    updateDiscordInviteLinks();  // Trackbare Links
+    
     // Update alle 60 Sekunden
-    setInterval(updateDiscordStats, 60000);
+    setInterval(() => {
+        updateDiscordMemberStats();
+        updateDiscordInviteLinks();
+    }, 60000);
 });
