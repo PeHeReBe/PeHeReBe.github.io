@@ -131,27 +131,60 @@ console.log('%cLooking for easter eggs? Keep exploring! 🔍', 'color: #a78bfa; 
 // Discord Server Status
 const DISCORD_GUILD_ID = '1146726678228373566';
 
-// Da die Discord API CORS blockiert, verwenden wir das iframe Widget
-// und setzen statische Fallback-Werte für die Anzeige
+// Verwende JSONP-Alternative für Discord Widget Daten
 function updateDiscordStats() {
-    const membersElement = document.getElementById('discord-members');
-    const onlineElement = document.getElementById('discord-online');
+    // Erstelle ein verstecktes iframe und versuche die Daten daraus zu lesen
+    const widgetUrl = `https://discord.com/api/guilds/${DISCORD_GUILD_ID}/widget.json`;
     
-    // Setze Platzhalter-Werte
-    if (membersElement) {
-        membersElement.textContent = '100+';
-        membersElement.style.animation = 'pulse 2s ease-in-out infinite';
-    }
-    
-    if (onlineElement) {
-        onlineElement.textContent = '10+';
-        onlineElement.style.animation = 'pulse 2s ease-in-out infinite';
-    }
-    
-    console.log('💬 Discord Widget ist als iframe eingebunden - Live Member-Zahlen werden dort angezeigt!');
+    // Verwende einen CORS-Proxy für die Anfrage
+    fetch(`https://corsproxy.io/?${encodeURIComponent(widgetUrl)}`)
+        .then(response => response.json())
+        .then(data => {
+            console.log('✅ Discord Widget Daten geladen:', data);
+            
+            const membersElement = document.getElementById('discord-members');
+            const onlineElement = document.getElementById('discord-online');
+            
+            // Update Member Count (approximiert aus presence_count)
+            if (membersElement && data.presence_count !== undefined) {
+                const approxMembers = Math.max(Math.floor(data.presence_count * 3), 100);
+                const rounded = approxMembers < 1000 ? 
+                    Math.floor(approxMembers / 10) * 10 + '+' : 
+                    Math.floor(approxMembers / 100) * 100 + '+';
+                membersElement.textContent = rounded;
+                membersElement.style.animation = 'pulse 2s ease-in-out infinite';
+            }
+            
+            // Update Online Count
+            if (onlineElement && data.presence_count !== undefined) {
+                onlineElement.textContent = data.presence_count;
+                onlineElement.style.animation = 'pulse 2s ease-in-out infinite';
+            }
+            
+            // Update alle Discord Join Buttons mit dem echten Invite Link
+            if (data.instant_invite) {
+                console.log('✅ Discord Invite Link:', data.instant_invite);
+                const discordButtons = document.querySelectorAll('#discord-join-btn, a[href*="discord.gg"]');
+                discordButtons.forEach(btn => {
+                    btn.href = data.instant_invite;
+                });
+                console.log(`✅ ${discordButtons.length} Discord Button(s) aktualisiert!`);
+            }
+        })
+        .catch(error => {
+            console.warn('⚠️ Discord Widget Fehler (nutze Fallback-Werte):', error.message);
+            
+            // Fallback Werte
+            const membersElement = document.getElementById('discord-members');
+            const onlineElement = document.getElementById('discord-online');
+            if (membersElement) membersElement.textContent = '100+';
+            if (onlineElement) onlineElement.textContent = '10+';
+        });
 }
 
 // Update Discord stats on page load
 if (document.getElementById('discord-members')) {
     updateDiscordStats();
+    // Update alle 60 Sekunden
+    setInterval(updateDiscordStats, 60000);
 }
