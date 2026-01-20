@@ -264,3 +264,37 @@ if (document.getElementById('discord-members')) {
     // Update alle 60 Sekunden
     setInterval(updateDiscordStats, 60000);
 }
+
+// Discord Widget - Dynamische Invite Links
+const DISCORD_SERVER_ID = '1175455629537591357'; // Deine Server ID
+
+function updateDiscordInviteLinks() {
+    const widgetUrl = `https://discord.com/api/guilds/${DISCORD_SERVER_ID}/widget.json`;
+    
+    fetch(widgetUrl)
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Widget nicht aktiviert');
+            }
+            return response.json();
+        })
+        .then(data => {
+            if (data.instant_invite) {
+                console.log('✅ Discord Widget Invite Link:', data.instant_invite);
+                
+                // Aktualisiere alle Discord Links auf der Seite
+                document.querySelectorAll('a[href*="discord.gg"]').forEach(link => {
+                    link.href = data.instant_invite;
+                    console.log('🔗 Discord Link aktualisiert:', link);
+                });
+            }
+        })
+        .catch(error => {
+            console.warn('⚠️ Discord Widget API Fehler:', error.message);
+            console.warn('💡 Tipp: Aktiviere das Server Widget in Discord Server-Einstellungen → Widget');
+            // Fallback: Links bleiben unverändert
+        });
+}
+
+// Lade Invite Links beim Seitenstart
+document.addEventListener('DOMContentLoaded', updateDiscordInviteLinks);
