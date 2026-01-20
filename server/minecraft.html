@@ -26,6 +26,12 @@
                         </svg>
                         Server IP kopieren
                     </button>
+                    <a href="https://pelican.afkingdom.de/server/bc4a4794" target="_blank" class="btn btn-secondary">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
+                        </svg>
+                        Server Panel
+                    </a>
                     <a href="https://discord.gg/HpWG5puTBQ" target="_blank" class="btn btn-secondary">Discord beitreten</a>
                 </div>
                 <p class="server-ip">afkingdom.de</p>
@@ -50,8 +56,8 @@
                     </div>
                     <div class="about-card">
                         <div class="card-icon">🏰</div>
-                        <h3>Schutz-System</h3>
-                        <p>Sichere deine Builds mit unserem GriefPrevention-System</p>
+                        <h3>Vanilla friendly</h3>
+                        <p>Baue frei und kreativ in unserer Vanilla-Welt</p>
                     </div>
                     <div class="about-card">
                         <div class="card-icon">💎</div>
@@ -91,7 +97,7 @@
     <script src="../script.js"></script>
     <script>
         function copyServerIP() {
-            const serverIP = 'play.afkingdom.de';
+            const serverIP = 'afkingdom.de';
             navigator.clipboard.writeText(serverIP).then(() => {
                 const btn = event.currentTarget;
                 const originalText = btn.innerHTML;
