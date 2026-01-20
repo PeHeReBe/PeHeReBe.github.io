@@ -129,67 +129,29 @@ console.log('%c🎮 Welcome to AFKingdom.de! 🎮', 'color: #7c3aed; font-size: 
 console.log('%cLooking for easter eggs? Keep exploring! 🔍', 'color: #a78bfa; font-size: 14px;');
 
 // Discord Server Status
-const DISCORD_GUILD_ID = '1146726678228373566'; // Ersetze mit deiner Discord Server ID
+const DISCORD_GUILD_ID = '1146726678228373566';
 
-function roundNumber(num) {
-    if (num < 100) return num.toString();
-    if (num < 1000) {
-        return Math.floor(num / 10) * 10 + '+';
-    }
-    return Math.floor(num / 100) * 100 + '+';
-}
-
+// Da die Discord API CORS blockiert, verwenden wir das iframe Widget
+// und setzen statische Fallback-Werte für die Anzeige
 function updateDiscordStats() {
-    // Discord Widget API
-    fetch(`https://discord.com/api/guilds/${DISCORD_GUILD_ID}/widget.json`)
-        .then(response => response.json())
-        .then(data => {
-            const membersElement = document.getElementById('discord-members');
-            const onlineElement = document.getElementById('discord-online');
-            
-            if (membersElement && data.presence_count) {
-                const approximateMembers = data.presence_count * 3; // Approximation
-                membersElement.textContent = roundNumber(approximateMembers);
-                membersElement.style.animation = 'fadeIn 0.5s ease-out';
-            }
-            
-            if (onlineElement && data.presence_count) {
-                onlineElement.textContent = data.presence_count;
-                onlineElement.style.animation = 'fadeIn 0.5s ease-out';
-            }
-            
-            // Update alle Discord-Links mit dem instant_invite
-            if (data.instant_invite) {
-                const discordLinks = document.querySelectorAll('a[href*="discord.gg"], a[href="https://discord.gg/DEIN_DISCORD_LINK"], a[href="#"]');
-                let updatedCount = 0;
-                discordLinks.forEach(link => {
-                    // Nur Links die zu Discord führen sollen aktualisieren (nicht alle # Links)
-                    if (link.href.includes('discord.gg') || link.href.includes('DEIN_DISCORD_LINK') || 
-                        (link.closest('.dropdown-content') && link.textContent.includes('Discord'))) {
-                        link.href = data.instant_invite;
-                        updatedCount++;
-                    }
-                });
-                if (updatedCount > 0) {
-                    console.log(`✅ ${updatedCount} Discord Einladungslink(s) automatisch aktualisiert!`);
-                }
-            } else {
-                console.log('⚠️ Kein instant_invite im Widget verfügbar. Bitte aktiviere "Instant Invite" in den Discord Widget-Einstellungen.');
-            }
-        })
-        .catch(error => {
-            console.log('Discord Widget nicht verfügbar. Bitte aktiviere das Widget in den Discord Servereinstellungen.');
-            // Fallback Werte
-            const membersElement = document.getElementById('discord-members');
-            const onlineElement = document.getElementById('discord-online');
-            if (membersElement) membersElement.textContent = '100+';
-            if (onlineElement) onlineElement.textContent = '10+';
-        });
+    const membersElement = document.getElementById('discord-members');
+    const onlineElement = document.getElementById('discord-online');
+    
+    // Setze Platzhalter-Werte
+    if (membersElement) {
+        membersElement.textContent = '100+';
+        membersElement.style.animation = 'pulse 2s ease-in-out infinite';
+    }
+    
+    if (onlineElement) {
+        onlineElement.textContent = '10+';
+        onlineElement.style.animation = 'pulse 2s ease-in-out infinite';
+    }
+    
+    console.log('💬 Discord Widget ist als iframe eingebunden - Live Member-Zahlen werden dort angezeigt!');
 }
 
 // Update Discord stats on page load
 if (document.getElementById('discord-members')) {
     updateDiscordStats();
-    // Update every 60 seconds
-    setInterval(updateDiscordStats, 60000);
 }
